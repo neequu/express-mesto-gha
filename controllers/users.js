@@ -63,6 +63,16 @@ export const postUser = async (req, res) => {
 export const patchUser = async (req, res) => {
   try {
     const { name, about } = req.body;
+
+    if (
+      !(name.length >= 2 && name.length <= 30) ||
+      !(about.length >= 2 && about.length <= 30)
+    ) {
+      return res
+        .status(BAD_REQUEST_STATUS)
+        .json({ message: "incorrect input" });
+    }
+
     const userId = req.user._id;
     const user = await User.findByIdAndUpdate(
       userId,
@@ -86,6 +96,7 @@ export const patchUser = async (req, res) => {
 export const patchUserAvatar = async (req, res) => {
   try {
     const { avatar } = req.body;
+
     const userId = req.user._id;
     const user = await User.findByIdAndUpdate(
       userId,
