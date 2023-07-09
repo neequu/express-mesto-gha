@@ -6,7 +6,6 @@ export const getCards = async (_, res) => {
     const cards = await Card.find();
     return res.status(200).json(cards);
   } catch (err) {
-    console.log(err);
     return res.status(500).json({ message: "couldn't get cards" });
   }
 };
@@ -22,7 +21,9 @@ export const deleteCard = async (req, res) => {
 
     return res.status(200).json(card);
   } catch (err) {
-    console.log(err);
+    if (err instanceof mongoose.Error.CastError) {
+      return res.status(400).json({ message: "card not found" });
+    }
     return res.status(500).json({ message: "couldn't delete card" });
   }
 };
@@ -37,7 +38,6 @@ export const postCard = async (req, res) => {
 
     return res.status(201).json(card);
   } catch (err) {
-    console.log(err);
     if (err instanceof mongoose.Error.ValidationError) {
       res.status(400).json({ message: "incorrect input" });
     }
@@ -57,11 +57,11 @@ export const likeCard = async (req, res) => {
       return res.status(404).json({ message: "card not found" });
     }
     return res.status(200).json(card);
-  } catch (e) {
-    console.log(e);
-    return res
-      .status(500)
-      .json({ message: "something went wrong during like attempt" });
+  } catch (err) {
+    if (err instanceof mongoose.Error.CastError) {
+      return res.status(400).json({ message: "card not found" });
+    }
+    return res.status(500).json({ message: "couldn't like the card" });
   }
 };
 export const unlikeCard = async (req, res) => {
@@ -77,10 +77,10 @@ export const unlikeCard = async (req, res) => {
       return res.status(404).json({ message: "card not found" });
     }
     return res.status(200).json(card);
-  } catch (e) {
-    console.log(e);
-    return res
-      .status(500)
-      .json({ message: "something went wrong during like attempt" });
+  } catch (err) {
+    if (err instanceof mongoose.Error.CastError) {
+      return res.status(400).json({ message: "card not found" });
+    }
+    return res.status(500).json({ message: "couldn't unlike the card" });
   }
 };
