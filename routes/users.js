@@ -6,6 +6,7 @@ import {
   patchUser,
   patchUserAvatar,
 } from "../controllers/users.js";
+// import { validateGetUser } from "../validaton.js";
 
 const usersRouter = express.Router();
 
