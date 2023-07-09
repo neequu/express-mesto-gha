@@ -22,13 +22,13 @@ export const getCards = async (_, res) => {
 export const deleteCard = async (req, res) => {
   try {
     const { cardId } = req.params;
-    const card = await Card.findById(cardId);
+    const card = await Card.findByIdAndDelete(cardId);
 
     if (!card) {
-      return res.status(NOT_FOUND_STATUS).json({ message: "card not found" });
+      return res.status(BAD_REQUEST_STATUS).json({ message: "card not found" });
     }
 
-    return res.status(OK_STATUS).json(card);
+    return res.status(OK_STATUS).json({ succes: true });
   } catch (err) {
     if (err instanceof mongoose.Error.CastError) {
       return res.status(NOT_FOUND_STATUS).json({ message: "card not found" });
@@ -72,7 +72,7 @@ export const likeCard = async (req, res) => {
     return res.status(OK_STATUS).json(card);
   } catch (err) {
     if (err instanceof mongoose.Error.CastError) {
-      return res.status(NOT_FOUND_STATUS).json({ message: "card not found" });
+      return res.status(BAD_REQUEST_STATUS).json({ message: "card not found" });
     }
     return res
       .status(INTERNAL_SERVER_STATUS)
@@ -94,7 +94,7 @@ export const unlikeCard = async (req, res) => {
     return res.status(OK_STATUS).json(card);
   } catch (err) {
     if (err instanceof mongoose.Error.CastError) {
-      return res.status(NOT_FOUND_STATUS).json({ message: "card not found" });
+      return res.status(BAD_REQUEST_STATUS).json({ message: "card not found" });
     }
     return res
       .status(INTERNAL_SERVER_STATUS)
