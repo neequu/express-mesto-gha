@@ -6,7 +6,7 @@ import usersRouter from "./routes/users.js";
 import cardsRouter from "./routes/cards.js";
 
 const PORT = process.env.PORT || 3000;
-const url = "mongodb+srv://nick:fVC4jTdF0g3DKMqY@13.xe57swi.mongodb.net/13";
+const url = "mongodb://localhost:27017/mestodb";
 const app = express();
 
 app.use(bodyParser.json());
