@@ -14,11 +14,9 @@
     "quotes": "off",
     "comma-dangle": ["error", "only-multiline"],
     "import/extensions": [
-    "error",
-    "ignorePackages",
-    {
-    "js": "always"
-    }
+      "error",
+      "ignorePackages",
+      { "js": "always" }
     ],
     "consistent-return": ["error", { "treatUndefinedAsUnspecified": true }],
     "operator-linebreak": ["error", "after"]

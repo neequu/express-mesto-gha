@@ -23,7 +23,7 @@ export const getUser = async (req, res) => {
   try {
     const userId = req.params.id;
     if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
-      return res.status(NOT_FOUND_STATUS).json({ message: "user not found" });
+      return res.status(BAD_REQUEST_STATUS).json({ message: "user not found" });
     }
     const user = await User.findById(userId);
 
