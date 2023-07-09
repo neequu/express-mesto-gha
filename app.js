@@ -5,7 +5,8 @@ import mongoose from "mongoose";
 import usersRouter from "./routes/users.js";
 import cardsRouter from "./routes/cards.js";
 
-import { PORT, url } from "./constants.js";
+import { PORT } from "./constants.js";
+const url = "mongodb://localhost:27017/mestodb";
 
 const app = express();
 
