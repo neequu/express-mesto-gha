@@ -6,6 +6,7 @@ import {
   NOT_FOUND_STATUS,
   BAD_REQUEST_STATUS,
   INTERNAL_SERVER_STATUS,
+  UNATHORIZED_STATUS,
 } from "../constants.js";
 
 export const getCards = async (_, res) => {
@@ -21,6 +22,8 @@ export const getCards = async (_, res) => {
 
 export const deleteCard = async (req, res) => {
   try {
+    const owner = req.user._id;
+
     const { cardId } = req.params;
     const card = await Card.findByIdAndDelete(cardId);
 
@@ -28,10 +31,14 @@ export const deleteCard = async (req, res) => {
       return res.status(BAD_REQUEST_STATUS).json({ message: "card not found" });
     }
 
+    if (card.owner !== owner) {
+      return res.status(UNATHORIZED_STATUS).json({ message: "not allowed" });
+    }
+
     return res.status(OK_STATUS).json({ succes: true });
   } catch (err) {
     if (err instanceof mongoose.Error.CastError) {
-      return res.status(NOT_FOUND_STATUS).json({ message: "card not found" });
+      return res.status(BAD_REQUEST_STATUS).json({ message: "bad input" });
     }
     return res
       .status(INTERNAL_SERVER_STATUS)
@@ -50,7 +57,9 @@ export const postCard = async (req, res) => {
     return res.status(CREATED_STATUS).json(card);
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
-      res.status(BAD_REQUEST_STATUS).json({ message: "incorrect input" });
+      return res
+        .status(BAD_REQUEST_STATUS)
+        .json({ message: "incorrect input" });
     }
     return res
       .status(INTERNAL_SERVER_STATUS)
@@ -72,11 +81,11 @@ export const likeCard = async (req, res) => {
     return res.status(OK_STATUS).json(card);
   } catch (err) {
     if (err instanceof mongoose.Error.CastError) {
-      return res.status(BAD_REQUEST_STATUS).json({ message: "card not found" });
+      return res.status(BAD_REQUEST_STATUS).json({ message: "bad card data" });
     }
     return res
       .status(INTERNAL_SERVER_STATUS)
-      .json({ message: "couldn't like the card" });
+      .json({ message: "couldn't set like" });
   }
 };
 export const unlikeCard = async (req, res) => {
@@ -94,10 +103,10 @@ export const unlikeCard = async (req, res) => {
     return res.status(OK_STATUS).json(card);
   } catch (err) {
     if (err instanceof mongoose.Error.CastError) {
-      return res.status(BAD_REQUEST_STATUS).json({ message: "card not found" });
+      return res.status(BAD_REQUEST_STATUS).json({ message: "bad card data" });
     }
     return res
       .status(INTERNAL_SERVER_STATUS)
-      .json({ message: "couldn't unlike the card" });
+      .json({ message: "couldn't unlike" });
   }
 };

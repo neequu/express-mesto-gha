@@ -34,7 +34,7 @@ export const getUser = async (req, res) => {
     return res.status(OK_STATUS).json(user);
   } catch (err) {
     if (err instanceof mongoose.Error.CastError) {
-      return res.status(BAD_REQUEST_STATUS).json({ message: "user not found" });
+      return res.status(BAD_REQUEST_STATUS).json({ message: "bad input" });
     }
     return res
       .status(INTERNAL_SERVER_STATUS)
@@ -73,7 +73,12 @@ export const patchUser = async (req, res) => {
         .json({ message: "incorrect input" });
     }
 
-    const userId = req.user._id;
+    const userId = req.params.id;
+
+    if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(BAD_REQUEST_STATUS).json({ message: "user not found" });
+    }
+
     const user = await User.findByIdAndUpdate(
       userId,
       { name, about },
@@ -97,7 +102,12 @@ export const patchUserAvatar = async (req, res) => {
   try {
     const { avatar } = req.body;
 
-    const userId = req.user._id;
+    const userId = req.params.id;
+
+    if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(BAD_REQUEST_STATUS).json({ message: "user not found" });
+    }
+
     const user = await User.findByIdAndUpdate(
       userId,
       { avatar },
