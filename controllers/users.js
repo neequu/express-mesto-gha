@@ -63,6 +63,7 @@ export const postUser = async (req, res) => {
 export const patchUser = async (req, res) => {
   try {
     const { name, about } = req.body;
+    const owner = req.user._id;
 
     if (
       !(name.length >= 2 && name.length <= 30) ||
@@ -73,14 +74,14 @@ export const patchUser = async (req, res) => {
         .json({ message: "incorrect input" });
     }
 
-    const userId = req.params.id;
+    // const userId = req.params.id;
 
-    if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
-      return res.status(BAD_REQUEST_STATUS).json({ message: "user not found" });
-    }
+    // if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
+    //   return res.status(BAD_REQUEST_STATUS).json({ message: "user not found" });
+    // }
 
     const user = await User.findByIdAndUpdate(
-      userId,
+      owner,
       { name, about },
       { new: true }
     );
@@ -102,17 +103,14 @@ export const patchUserAvatar = async (req, res) => {
   try {
     const { avatar } = req.body;
 
-    const userId = req.params.id;
+    // const userId = req.params.id;
 
-    if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
-      return res.status(BAD_REQUEST_STATUS).json({ message: "user not found" });
-    }
+    // if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
+    //   return res.status(BAD_REQUEST_STATUS).json({ message: "user not found" });
+    // }
+    const owner = req.user._id;
 
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { avatar },
-      { new: true }
-    );
+    const user = await User.findByIdAndUpdate(owner, { avatar }, { new: true });
     if (!user) {
       return res.status(NOT_FOUND_STATUS).json({ message: "user not found" });
     }

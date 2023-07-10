@@ -22,7 +22,7 @@ export const getCards = async (_, res) => {
 
 export const deleteCard = async (req, res) => {
   try {
-    const owner = req.user._id;
+    // const owner = req.user._id;
 
     const { cardId } = req.params;
     const card = await Card.findByIdAndDelete(cardId);
