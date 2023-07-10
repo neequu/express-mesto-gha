@@ -7,8 +7,8 @@ import cardsRouter from "./routes/cards.js";
 
 import { PORT } from "./constants.js";
 
-// const url = "mongodb://localhost:27017/mestodb";
-const url = "mongodb+srv://nick:fVC4jTdF0g3DKMqY@13.xe57swi.mongodb.net/13";
+const url = "mongodb://localhost:27017/mestodb";
+// const url = "mongodb+srv://nick:fVC4jTdF0g3DKMqY@13.xe57swi.mongodb.net/13";
 
 const app = express();
 
