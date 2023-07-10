@@ -102,15 +102,9 @@ export const patchUser = async (req, res) => {
 export const patchUserAvatar = async (req, res) => {
   try {
     const { avatar } = req.body;
-
-    // const userId = req.params.id;
-
-    // if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
-    //   return res.status(BAD_REQUEST_STATUS).json({ message: "user not found" });
-    // }
     const owner = req.user._id;
-
     const user = await User.findByIdAndUpdate(owner, { avatar }, { new: true });
+
     if (!user) {
       return res.status(NOT_FOUND_STATUS).json({ message: "user not found" });
     }
