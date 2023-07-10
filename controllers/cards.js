@@ -28,14 +28,14 @@ export const deleteCard = async (req, res) => {
     const card = await Card.findByIdAndDelete(cardId);
 
     if (!card) {
-      return res.status(BAD_REQUEST_STATUS).json({ message: "card not found" });
+      return res.status(NOT_FOUND_STATUS).json({ message: "card not found" });
     }
 
-    if (card.owner !== owner) {
-      return res.status(UNATHORIZED_STATUS).json({ message: "not allowed" });
-    }
+    // if (card.owner !== owner) {
+    //   return res.status(UNATHORIZED_STATUS).json({ message: "not allowed" });
+    // }
 
-    return res.status(OK_STATUS).json({ succes: true });
+    return res.status(OK_STATUS).json(card);
   } catch (err) {
     if (err instanceof mongoose.Error.CastError) {
       return res.status(BAD_REQUEST_STATUS).json({ message: "bad input" });
