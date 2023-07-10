@@ -6,7 +6,6 @@ import {
   NOT_FOUND_STATUS,
   BAD_REQUEST_STATUS,
   INTERNAL_SERVER_STATUS,
-  UNATHORIZED_STATUS,
 } from "../constants.js";
 
 export const getCards = async (_, res) => {
