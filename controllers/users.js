@@ -76,11 +76,11 @@ const updateUser = async (req, res, _, data) => {
   }
 };
 
-export const updateProfile = (req, res, _) => {
+export const updateProfile = (req, res) => {
   const { name, about } = req.body;
   return updateUser(req, res, _, { name, about });
 };
-export const updateAvatar = (req, res, _) => {
+export const updateAvatar = (req, res) => {
   const { avatar } = req.body;
   return updateUser(req, res, _, { avatar });
 };
