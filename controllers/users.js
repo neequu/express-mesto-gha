@@ -78,9 +78,9 @@ const updateUser = async (req, res, _, data) => {
 
 export const updateProfile = (req, res, _) => {
   const { name, about } = req.body;
-  return _updateUser(req, res, next, { name, about });
+  return updateUser(req, res, next, { name, about });
 };
 export const updateAvatar = (req, res, _) => {
   const { avatar } = req.body;
-  return _updateUser(req, res, next, { avatar });
+  return updateUser(req, res, next, { avatar });
 };
