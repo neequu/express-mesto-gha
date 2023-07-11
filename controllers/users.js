@@ -95,7 +95,7 @@ export const patchUserAvatar = async (req, res) => {
       { new: true, runValidators: true }
     );
 
-    return res.send(avatar);
+    return res.send({ message: "success" });
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
       res.status(BAD_REQUEST_STATUS).json({ message: "incorrect input" });
