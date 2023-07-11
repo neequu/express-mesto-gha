@@ -16,8 +16,8 @@
       "error",
       "ignorePackages",
       { "js": "always" }
-    ]
-    // "linebreak-style": "off",
+    ],
+    "linebreak-style": "off"
     // "consistent-return": ["error", { "treatUndefinedAsUnspecified": true }],
     // "operator-linebreak": ["error", "after"]
   }
