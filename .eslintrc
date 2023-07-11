@@ -5,8 +5,7 @@
       "error",
       {
         "allow": [
-          "_id",
-          "_updateUser"
+          "_id"
         ]
       }
     ],

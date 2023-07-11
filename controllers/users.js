@@ -55,7 +55,7 @@ export const createUser = async (req, res) => {
   }
 };
 
-const _updateUser = async (req, res, next, data) => {
+const updateUser = async (req, res, _, data) => {
   const owner = req.user._id;
   try {
     const user = await User.findByIdAndUpdate(owner, data, {
@@ -76,30 +76,11 @@ const _updateUser = async (req, res, next, data) => {
   }
 };
 
-export const updateProfile = (req, res, next) => {
+export const updateProfile = (req, res, _) => {
   const { name, about } = req.body;
   return _updateUser(req, res, next, { name, about });
 };
-export const updateAvatar = (req, res, next) => {
+export const updateAvatar = (req, res, _) => {
   const { avatar } = req.body;
   return _updateUser(req, res, next, { avatar });
 };
-
-// export const updateAvatar = async (req, res, next) => {
-//   const { avatar } = req.body;
-//   try {
-//     await User.findByIdAndUpdate(
-//       owner,
-//       { avatar },
-//       { new: true, runValidators: true }
-//     );
-//     return res.status(OK_STATUS).json({ avatar });
-//   } catch (err) {
-//     if (err instanceof mongoose.Error.ValidationError) {
-//       res.status(BAD_REQUEST_STATUS).json({ message: "incorrect input" });
-//     }
-//     return res
-//       .status(INTERNAL_SERVER_STATUS)
-//       .json({ message: "couldn't update avatar" });
-//   }
-// };
