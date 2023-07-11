@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 import User from "../models/User.js";
 import {
-  OK_STATUS,
-  CREATED_STATUS,
-  NOT_FOUND_STATUS,
   BAD_REQUEST_STATUS,
   INTERNAL_SERVER_STATUS,
-} from "../constants.js";
+  OK_STATUS,
+  NOT_FOUND_STATUS,
+  CREATED_STATUS,
+} from "../utils/constants.js";
 
 export const getUsers = async (_, res) => {
   try {
@@ -20,37 +20,34 @@ export const getUsers = async (_, res) => {
 };
 
 export const getUser = async (req, res) => {
+  const userId = req.params.id;
   try {
-    const userId = req.params.id;
-
-    // if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
-    //   return res.status(BAD_REQUEST_STATUS).json({ message: "user not found" });
-    // }
-
-    const user = await User.findById(userId).orFail(new Error("Not Found"));
+    const user = await User.findById(userId).orFail(new Error("not found"));
 
     return res.status(OK_STATUS).json(user);
   } catch (err) {
-    if (err.message === "Not Found") {
-      return res.status(NOT_FOUND_STATUS).json({ message: "user not found" });
+    if (err.message === "not found") {
+      return res.status(NOT_FOUND_STATUS).send({ message: "user not found" });
     }
-    return res
-      .status(INTERNAL_SERVER_STATUS)
-      .json({ message: "couldn't get user" });
+    if (err instanceof mongoose.Error.CastError) {
+      return res
+        .status(BAD_REQUEST_STATUS)
+        .send({ message: "error getting the user" });
+    }
+    return res.status(INTERNAL_SERVER_STATUS).send({ message: "server error" });
   }
 };
 
-export const postUser = async (req, res) => {
+export const createUser = async (req, res) => {
+  const { name, about, avatar } = req.body;
   try {
-    const { name, about, avatar } = req.body;
-
-    const doc = new User({ name, about, avatar });
-    const user = await doc.save();
-
+    const user = await User.create({ name, about, avatar });
     return res.status(CREATED_STATUS).json(user);
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
-      res.status(BAD_REQUEST_STATUS).json({ message: "incorrect input" });
+      return res
+        .status(BAD_REQUEST_STATUS)
+        .json({ message: "incorrect input" });
     }
     return res
       .status(INTERNAL_SERVER_STATUS)
@@ -58,27 +55,22 @@ export const postUser = async (req, res) => {
   }
 };
 
-export const patchUser = async (req, res) => {
+export const updateProfile = async (req, res) => {
+  const { name, about } = req.body;
+  const owner = req.user._id;
   try {
-    const { name, about } = req.body;
-    const owner = req.user._id;
-
-    // const userId = req.params.id;
-
-    // if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
-    //   return res.status(BAD_REQUEST_STATUS).json({ message: "user not found" });
-    // }
-
     const user = await User.findByIdAndUpdate(
       owner,
       { name, about },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     return res.status(OK_STATUS).json(user);
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
-      res.status(BAD_REQUEST_STATUS).json({ message: "incorrect input" });
+      return res
+        .status(BAD_REQUEST_STATUS)
+        .json({ message: "incorrect input" });
     }
     return res
       .status(INTERNAL_SERVER_STATUS)
@@ -86,16 +78,16 @@ export const patchUser = async (req, res) => {
   }
 };
 
-export const patchUserAvatar = async (req, res) => {
+export const updateAvatar = async (req, res) => {
+  const { avatar } = req.body;
+  const owner = req.user._id;
   try {
-    const { avatar } = req.body;
     await User.findByIdAndUpdate(
-      req.user._id,
+      owner,
       { avatar },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
-
-    return res.send({ message: "success" });
+    return res.status(OK_STATUS).json({ avatar });
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
       res.status(BAD_REQUEST_STATUS).json({ message: "incorrect input" });

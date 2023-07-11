@@ -1,23 +1,24 @@
-import mongoose from "mongoose";
+import { Schema, model } from "mongoose";
 
-const UserSchema = new mongoose.Schema({
+const UserSchema = new Schema({
   name: {
     type: String,
     required: true,
     minlength: [2, "длина поля должна быть от 2 до 30 символов"],
     maxlength: [30, "длина поля должна быть от 2 до 30 символов"],
   },
+
   about: {
     type: String,
     required: true,
     minlength: [2, "длина поля должна быть от 2 до 30 символов"],
     maxlength: [30, "длина поля должна быть от 2 до 30 символов"],
   },
+
   avatar: {
     type: String,
     required: true,
-    match: /(https?:\/\/.*\.(?:png|jpg|bmp|webp))/i,
   },
 });
 
-export default mongoose.model("User", UserSchema);
+export default model("User", UserSchema);

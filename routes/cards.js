@@ -1,18 +1,18 @@
 import express from "express";
 import {
   getCards,
+  createCard,
   deleteCard,
-  postCard,
   likeCard,
   unlikeCard,
 } from "../controllers/cards.js";
 
-const cardsRouter = express.Router();
+const router = express.Router();
 
-cardsRouter.get("/", getCards);
-cardsRouter.post("/", postCard);
-cardsRouter.delete("/:cardId", deleteCard);
-cardsRouter.put("/:cardId/likes", likeCard);
-cardsRouter.delete("/:cardId/likes", unlikeCard);
+router.get("/", getCards);
+router.post("/", createCard);
+router.delete("/:cardId", deleteCard);
+router.put("/:cardId/likes", likeCard);
+router.delete("/:cardId/likes", unlikeCard);
 
-export default cardsRouter;
+export default router;

@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 import Card from "../models/Card.js";
 import {
-  OK_STATUS,
-  CREATED_STATUS,
-  NOT_FOUND_STATUS,
   BAD_REQUEST_STATUS,
   INTERNAL_SERVER_STATUS,
-} from "../constants.js";
+  OK_STATUS,
+  NOT_FOUND_STATUS,
+  CREATED_STATUS,
+} from "../utils/constants.js";
 
 export const getCards = async (_, res) => {
   try {
@@ -20,44 +20,29 @@ export const getCards = async (_, res) => {
 };
 
 export const deleteCard = async (req, res) => {
+  const { cardId } = req.params;
   try {
-    // const owner = req.user._id;
+    await Card.findByIdAndDelete(cardId).orFail(new Error("not found"));
 
-    const { cardId } = req.params;
-    const card = await Card.findByIdAndDelete(cardId).orFail(
-      new Error("Not Found")
-    );
-
-    if (!card) {
-      return res.status(NOT_FOUND_STATUS).json({ message: "card not found" });
-    }
-
-    // if (card.owner !== owner) {
-    //   return res.status(UNATHORIZED_STATUS).json({ message: "not allowed" });
-    // }
-
-    return res.status(OK_STATUS).json({ message: "card deleted" });
+    return res.status(OK_STATUS).json({ message: "success" });
   } catch (err) {
+    if (err.message === "not found") {
+      return res.status(NOT_FOUND_STATUS).send({ message: "user not found" });
+    }
     if (err instanceof mongoose.Error.CastError) {
-      return res.status(BAD_REQUEST_STATUS).json({ message: "bad input" });
+      return res
+        .status(BAD_REQUEST_STATUS)
+        .send({ message: "error getting the user" });
     }
-    if (err.message === "Not Found") {
-      return res.status(NOT_FOUND_STATUS).json({ message: "card not found" });
-    }
-    return res
-      .status(INTERNAL_SERVER_STATUS)
-      .json({ message: "couldn't delete card" });
+    return res.status(INTERNAL_SERVER_STATUS).send({ message: "server error" });
   }
 };
 
-export const postCard = async (req, res) => {
+export const createCard = async (req, res) => {
+  const { name, link } = req.body;
+  const owner = req.user;
   try {
-    const { name, link } = req.body;
-    const owner = req.user;
-
-    const doc = new Card({ name, link, owner });
-    const card = await doc.save();
-
+    const card = await Card.create({ name, link, owner });
     return res.status(CREATED_STATUS).json(card);
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
@@ -72,20 +57,21 @@ export const postCard = async (req, res) => {
 };
 
 export const likeCard = async (req, res) => {
+  const { cardId } = req.params;
+  const owner = req.user._id;
   try {
-    const { cardId } = req.params;
     await Card.findByIdAndUpdate(
       cardId,
-      { $addToSet: { likes: req.user._id } },
-      { new: true }
-    ).orFail(new Error("Not Found"));
+      { $addToSet: { likes: owner } },
+      { new: true },
+    ).orFail(new Error("not found"));
 
     return res.status(OK_STATUS).json({ message: "liked" });
   } catch (err) {
     if (err instanceof mongoose.Error.CastError) {
       return res.status(BAD_REQUEST_STATUS).json({ message: "bad card data" });
     }
-    if (err.message === "Not Found") {
+    if (err.message === "not found") {
       return res.status(NOT_FOUND_STATUS).json({ message: "card not found" });
     }
     return res
@@ -93,22 +79,24 @@ export const likeCard = async (req, res) => {
       .json({ message: "couldn't set like" });
   }
 };
-export const unlikeCard = async (req, res) => {
-  try {
-    const { cardId } = req.params;
 
+export const unlikeCard = async (req, res) => {
+  const { cardId } = req.params;
+  const owner = req.user._id;
+
+  try {
     await Card.findByIdAndUpdate(
       cardId,
-      { $pull: { likes: req.user._id } },
-      { new: true }
-    ).orFail(new Error("Not Found"));
+      { $pull: { likes: owner } },
+      { new: true },
+    ).orFail(new Error("not found"));
 
     return res.status(OK_STATUS).json({ message: "unliked" });
   } catch (err) {
     if (err instanceof mongoose.Error.CastError) {
       return res.status(BAD_REQUEST_STATUS).json({ message: "bad card data" });
     }
-    if (err.message === "Not Found") {
+    if (err.message === "not found") {
       return res.status(NOT_FOUND_STATUS).json({ message: "card not found" });
     }
     return res

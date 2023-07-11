@@ -1,23 +1,26 @@
-import mongoose from "mongoose";
+import { Schema, model } from "mongoose";
 
-const { ObjectId } = mongoose.Schema.Types;
+const { ObjectId } = Schema.Types;
 
-const CardSchema = new mongoose.Schema({
+const CardSchema = new Schema({
   name: {
     type: String,
     required: true,
     minlength: [2, "длина поля должна быть от 2 до 30 символов"],
     maxlength: [30, "длина поля должна быть от 2 до 30 символов"],
   },
+
   link: {
     type: String,
     required: true,
   },
+
   owner: {
     type: ObjectId,
-    required: true,
     ref: "user",
+    required: true,
   },
+
   likes: [
     {
       type: ObjectId,
@@ -25,10 +28,11 @@ const CardSchema = new mongoose.Schema({
       default: [],
     },
   ],
+
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
 
-export default mongoose.model("Card", CardSchema);
+export default model("Card", CardSchema);

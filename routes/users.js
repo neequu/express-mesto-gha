@@ -2,18 +2,17 @@ import express from "express";
 import {
   getUsers,
   getUser,
-  postUser,
-  patchUser,
-  patchUserAvatar,
+  createUser,
+  updateProfile,
+  updateAvatar,
 } from "../controllers/users.js";
-// import { validateGetUser } from "../validaton.js";
 
-const usersRouter = express.Router();
+const router = express.Router();
 
-usersRouter.get("/", getUsers);
-usersRouter.get("/:id", getUser);
-usersRouter.post("/", postUser);
-usersRouter.patch("/me", patchUser);
-usersRouter.patch("/me/avatar", patchUserAvatar);
+router.get("/", getUsers);
+router.get("/:id", getUser);
+router.post("/", createUser);
+router.patch("/me", updateProfile);
+router.patch("/me/avatar", updateAvatar);
 
-export default usersRouter;
+export default router;
