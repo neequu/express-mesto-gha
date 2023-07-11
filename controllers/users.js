@@ -55,15 +55,13 @@ export const createUser = async (req, res) => {
   }
 };
 
-export const updateProfile = async (req, res) => {
-  const { name, about } = req.body;
+const _updateUser = async (req, res, next, data) => {
   const owner = req.user._id;
   try {
-    const user = await User.findByIdAndUpdate(
-      owner,
-      { name, about },
-      { new: true, runValidators: true }
-    );
+    const user = await User.findByIdAndUpdate(owner, data, {
+      new: true,
+      runValidators: true,
+    });
 
     return res.status(OK_STATUS).json(user);
   } catch (err) {
@@ -78,22 +76,30 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-export const updateAvatar = async (req, res) => {
-  const { avatar } = req.body;
-  const owner = req.user._id;
-  try {
-    await User.findByIdAndUpdate(
-      owner,
-      { avatar },
-      { new: true, runValidators: true }
-    );
-    return res.status(OK_STATUS).json({ avatar });
-  } catch (err) {
-    if (err instanceof mongoose.Error.ValidationError) {
-      res.status(BAD_REQUEST_STATUS).json({ message: "incorrect input" });
-    }
-    return res
-      .status(INTERNAL_SERVER_STATUS)
-      .json({ message: "couldn't update avatar" });
-  }
+export const updateProfile = (req, res, next) => {
+  const { name, about } = req.body;
+  return _updateUser(req, res, next, { name, about });
 };
+export const updateAvatar = (req, res, next) => {
+  const { avatar } = req.body;
+  return _updateUser(req, res, next, { avatar });
+};
+
+// export const updateAvatar = async (req, res, next) => {
+//   const { avatar } = req.body;
+//   try {
+//     await User.findByIdAndUpdate(
+//       owner,
+//       { avatar },
+//       { new: true, runValidators: true }
+//     );
+//     return res.status(OK_STATUS).json({ avatar });
+//   } catch (err) {
+//     if (err instanceof mongoose.Error.ValidationError) {
+//       res.status(BAD_REQUEST_STATUS).json({ message: "incorrect input" });
+//     }
+//     return res
+//       .status(INTERNAL_SERVER_STATUS)
+//       .json({ message: "couldn't update avatar" });
+//   }
+// };

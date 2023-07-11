@@ -2,8 +2,7 @@ import express from "express";
 import { connect } from "mongoose";
 import routes from "./routes/index.js";
 
-const { PORT = 3000, DB_URL = "mongodb://127.0.0.1:27017/mestodb" } =
-  process.env;
+const { PORT = 3000, DB_URL = "mongodb://127.0.0.1:27017/mestodb" } = process.env;
 
 const app = express();
 

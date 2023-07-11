@@ -63,7 +63,7 @@ export const likeCard = async (req, res) => {
     await Card.findByIdAndUpdate(
       cardId,
       { $addToSet: { likes: owner } },
-      { new: true }
+      { new: true },
     ).orFail(new Error("not found"));
 
     return res.status(OK_STATUS).json({ message: "liked" });
@@ -88,7 +88,7 @@ export const unlikeCard = async (req, res) => {
     await Card.findByIdAndUpdate(
       cardId,
       { $pull: { likes: owner } },
-      { new: true }
+      { new: true },
     ).orFail(new Error("not found"));
 
     return res.status(OK_STATUS).json({ message: "unliked" });
