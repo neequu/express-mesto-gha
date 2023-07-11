@@ -89,14 +89,13 @@ export const patchUser = async (req, res) => {
 export const patchUserAvatar = async (req, res) => {
   try {
     const { avatar } = req.body;
-    const owner = req.user._id;
     const user = await User.findByIdAndUpdate(
-      owner,
+      req.user._id,
       { avatar },
       { new: true, runValidators: true }
     );
 
-    return res.json(user);
+    return res.json(avatar);
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
       res.status(BAD_REQUEST_STATUS).json({ message: "incorrect input" });
