@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Card from "../models/Card.js";
+import Card from "../models/card.js";
 import {
   BAD_REQUEST_STATUS,
   INTERNAL_SERVER_STATUS,
@@ -27,12 +27,12 @@ export const deleteCard = async (req, res) => {
     return res.status(OK_STATUS).json({ message: "success" });
   } catch (err) {
     if (err.message === "not found") {
-      return res.status(NOT_FOUND_STATUS).send({ message: "user not found" });
+      return res.status(NOT_FOUND_STATUS).send({ message: "card not found" });
     }
     if (err instanceof mongoose.Error.CastError) {
       return res
         .status(BAD_REQUEST_STATUS)
-        .send({ message: "error getting the user" });
+        .send({ message: "error getting the card" });
     }
     return res.status(INTERNAL_SERVER_STATUS).send({ message: "server error" });
   }
@@ -63,7 +63,7 @@ export const likeCard = async (req, res) => {
     await Card.findByIdAndUpdate(
       cardId,
       { $addToSet: { likes: owner } },
-      { new: true },
+      { new: true }
     ).orFail(new Error("not found"));
 
     return res.status(OK_STATUS).json({ message: "liked" });
@@ -88,7 +88,7 @@ export const unlikeCard = async (req, res) => {
     await Card.findByIdAndUpdate(
       cardId,
       { $pull: { likes: owner } },
-      { new: true },
+      { new: true }
     ).orFail(new Error("not found"));
 
     return res.status(OK_STATUS).json({ message: "unliked" });

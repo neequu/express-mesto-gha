@@ -35,4 +35,4 @@ const CardSchema = new Schema({
   },
 });
 
-export default model("Card", CardSchema);
+export default model("card", CardSchema);

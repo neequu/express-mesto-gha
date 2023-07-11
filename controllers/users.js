@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import User from "../models/User.js";
+import User from "../models/user.js";
 import {
   BAD_REQUEST_STATUS,
   INTERNAL_SERVER_STATUS,
@@ -62,7 +62,7 @@ export const updateProfile = async (req, res) => {
     const user = await User.findByIdAndUpdate(
       owner,
       { name, about },
-      { new: true, runValidators: true },
+      { new: true, runValidators: true }
     );
 
     return res.status(OK_STATUS).json(user);
@@ -85,7 +85,7 @@ export const updateAvatar = async (req, res) => {
     await User.findByIdAndUpdate(
       owner,
       { avatar },
-      { new: true, runValidators: true },
+      { new: true, runValidators: true }
     );
     return res.status(OK_STATUS).json({ avatar });
   } catch (err) {
