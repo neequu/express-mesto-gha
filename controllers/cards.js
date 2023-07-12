@@ -77,13 +77,13 @@ const updateCardLike = async (req, res, _, action) => {
   }
 };
 
-export const likeCard = async (req, res, _) => {
+export const likeCard = (req, res, _) => {
   const owner = req.user._id;
   const likeAction = { $addToSet: { likes: owner } };
   updateCardLike(req, res, _, likeAction);
 };
 
-export const unlikeCard = async (req, res, _) => {
+export const unlikeCard = (req, res, _) => {
   const owner = req.user._id;
   const unlikeAction = { $pull: { likes: owner } };
   updateCardLike(req, res, _, unlikeAction);
