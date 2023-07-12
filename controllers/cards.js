@@ -56,17 +56,14 @@ export const createCard = async (req, res) => {
   }
 };
 
-export const likeCard = async (req, res) => {
+const updateCardLike = async (req, res, _, action) => {
   const { cardId } = req.params;
-  const owner = req.user._id;
   try {
-    await Card.findByIdAndUpdate(
-      cardId,
-      { $addToSet: { likes: owner } },
-      { new: true },
-    ).orFail(new Error("not found"));
+    await Card.findByIdAndUpdate(cardId, action, { new: true }).orFail(
+      new Error("not found"),
+    );
 
-    return res.status(OK_STATUS).json({ message: "liked" });
+    return res.status(OK_STATUS).json({ message: "success" });
   } catch (err) {
     if (err instanceof mongoose.Error.CastError) {
       return res.status(BAD_REQUEST_STATUS).json({ message: "bad card data" });
@@ -80,27 +77,14 @@ export const likeCard = async (req, res) => {
   }
 };
 
-export const unlikeCard = async (req, res) => {
-  const { cardId } = req.params;
+export const likeCard = async (req, res, _) => {
   const owner = req.user._id;
+  const likeAction = { $addToSet: { likes: owner } };
+  updateCardLike(req, res, _, likeAction);
+};
 
-  try {
-    await Card.findByIdAndUpdate(
-      cardId,
-      { $pull: { likes: owner } },
-      { new: true },
-    ).orFail(new Error("not found"));
-
-    return res.status(OK_STATUS).json({ message: "unliked" });
-  } catch (err) {
-    if (err instanceof mongoose.Error.CastError) {
-      return res.status(BAD_REQUEST_STATUS).json({ message: "bad card data" });
-    }
-    if (err.message === "not found") {
-      return res.status(NOT_FOUND_STATUS).json({ message: "card not found" });
-    }
-    return res
-      .status(INTERNAL_SERVER_STATUS)
-      .json({ message: "couldn't unlike" });
-  }
+export const unlikeCard = async (req, res, _) => {
+  const owner = req.user._id;
+  const unlikeAction = { $pull: { likes: owner } };
+  updateCardLike(req, res, _, unlikeAction);
 };
