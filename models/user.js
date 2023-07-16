@@ -1,7 +1,5 @@
 import { Schema, model } from 'mongoose';
-// eslint-disable-next-line import/no-unresolved
-import isEmail from 'validator/lib/isEmail';
-// eslint-disable-next-line import/no-extraneous-dependencies
+import isEmail from 'validator/lib/isEmail.js';
 import bcrypt from 'bcrypt';
 
 const UserSchema = new Schema({
