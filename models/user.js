@@ -31,7 +31,7 @@ const UserSchema = new Schema({
     unique: true,
     validate: {
       validator: (email) => isEmail(email),
-      message: 'Неверно указана почта',
+      message: 'incorrect email',
     },
   },
   password: {

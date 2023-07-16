@@ -6,7 +6,7 @@ import auth from './middlewares/auth.js';
 import { INTERNAL_SERVER_STATUS } from './utils/constants.js';
 import { validateLogin, validateCreateUser } from './middlewares/validation.js';
 
-const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
+const { PORT = 3000, DB_URL = 'mongodb+srv://nick:fVC4jTdF0g3DKMqY@13.xe57swi.mongodb.net/13' } = process.env;
 
 const app = express();
 
@@ -16,8 +16,9 @@ app.post('/signin', validateLogin, login);
 app.post('/signup', validateCreateUser, createUser);
 app.use(auth, routes);
 
-app.use((err, req, res, next) => {
+app.use((err, _, res, next) => {
   const { statusCode = INTERNAL_SERVER_STATUS, message } = err;
+  console.log(err)
   const errorMessage = statusCode === INTERNAL_SERVER_STATUS
     ? 'server error'
     : message;
@@ -25,7 +26,7 @@ app.use((err, req, res, next) => {
   res
     .status(statusCode)
     .json({
-      message: errorMessage,
+      message: message,
     });
 
   next();

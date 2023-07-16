@@ -10,7 +10,7 @@ export default function auth(req, res, next) {
   if (!authorization || !authorization.startsWith('Bearer ')) {
     return res
       .status(UNATHORIZED_STATUS)
-      .send({ message: 'Необходима авторизация' });
+      .json({ message: 'need to sign in' });
   }
 
   const token = authorization.replace('Bearer ', '');
@@ -21,7 +21,7 @@ export default function auth(req, res, next) {
   } catch (err) {
     return res
       .status(UNATHORIZED_STATUS)
-      .send({ message: 'Необходима авторизация' });
+      .json({ message: 'need to sign in' });
   }
 
   req.user = payload;
