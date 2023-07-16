@@ -2,6 +2,7 @@ import { Schema, model } from 'mongoose';
 import isEmail from 'validator/lib/isEmail.js';
 import bcrypt from 'bcrypt';
 import { linkRegex } from '../utils/constants.js';
+import UnathorizedError from '../errors/unathorized.js';
 
 const UserSchema = new Schema({
   name: {
@@ -47,12 +48,12 @@ UserSchema.statics.findUserByCredentials = async function (email, password) {
     const user = await this.findOne({ email }).select('+password');
 
     if (!user) {
-      throw new Error('Неправильные почта или пароль');
+      return Promise.reject(UnathorizedError('bad password or email'));
     }
     const matched = await bcrypt.compare(password, user.password);
 
     if (!matched) {
-      throw new Error('Неправильные почта или пароль');
+      return Promise.reject(UnathorizedError('bad password or email'));
     }
 
     return user;

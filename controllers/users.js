@@ -54,7 +54,9 @@ export const createUser = async (req, res, next) => {
       name, about, avatar, email, password: hash,
     });
 
-    return res.status(CREATED_STATUS).json({name, about, avatar, email});
+    return res.status(CREATED_STATUS).json({
+      name, about, avatar, email,
+    });
   } catch (err) {
     if (err.code === 11000) return next(new ConflictError('already exists'));
     if (err instanceof mongoose.Error.ValidationError) return next(new BadRequestError('bad data'));
