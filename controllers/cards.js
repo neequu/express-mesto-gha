@@ -1,12 +1,13 @@
-import mongoose from "mongoose";
-import Card from "../models/card.js";
+import mongoose from 'mongoose';
+import Card from '../models/card.js';
 import {
   BAD_REQUEST_STATUS,
   INTERNAL_SERVER_STATUS,
   OK_STATUS,
   NOT_FOUND_STATUS,
   CREATED_STATUS,
-} from "../utils/constants.js";
+  UNATHORIZED_STATUS,
+} from '../utils/constants.js';
 
 export const getCards = async (_, res) => {
   try {
@@ -21,20 +22,24 @@ export const getCards = async (_, res) => {
 
 export const deleteCard = async (req, res) => {
   const { cardId } = req.params;
+  const ownerId = req.user._id;
   try {
-    await Card.findByIdAndDelete(cardId).orFail(new Error("not found"));
+    const card = await Card.findByIdAndDelete(cardId).orFail(new Error('not found'));
+    if (card.owner !== ownerId) {
+      return res.status(UNATHORIZED_STATUS).send({ message: 'unathorized request' });
+    }
 
-    return res.status(OK_STATUS).json({ message: "success" });
+    return res.status(OK_STATUS).json({ message: 'success' });
   } catch (err) {
-    if (err.message === "not found") {
-      return res.status(NOT_FOUND_STATUS).send({ message: "card not found" });
+    if (err.message === 'not found') {
+      return res.status(NOT_FOUND_STATUS).send({ message: 'card not found' });
     }
     if (err instanceof mongoose.Error.CastError) {
       return res
         .status(BAD_REQUEST_STATUS)
-        .send({ message: "error getting the card" });
+        .send({ message: 'error getting the card' });
     }
-    return res.status(INTERNAL_SERVER_STATUS).send({ message: "server error" });
+    return res.status(INTERNAL_SERVER_STATUS).send({ message: 'server error' });
   }
 };
 
@@ -48,7 +53,7 @@ export const createCard = async (req, res) => {
     if (err instanceof mongoose.Error.ValidationError) {
       return res
         .status(BAD_REQUEST_STATUS)
-        .json({ message: "incorrect input" });
+        .json({ message: 'incorrect input' });
     }
     return res
       .status(INTERNAL_SERVER_STATUS)
@@ -60,16 +65,16 @@ const updateCardLike = async (req, res, _, action) => {
   const { cardId } = req.params;
   try {
     await Card.findByIdAndUpdate(cardId, action, { new: true }).orFail(
-      new Error("not found"),
+      new Error('not found'),
     );
 
-    return res.status(OK_STATUS).json({ message: "success" });
+    return res.status(OK_STATUS).json({ message: 'success' });
   } catch (err) {
     if (err instanceof mongoose.Error.CastError) {
-      return res.status(BAD_REQUEST_STATUS).json({ message: "bad card data" });
+      return res.status(BAD_REQUEST_STATUS).json({ message: 'bad card data' });
     }
-    if (err.message === "not found") {
-      return res.status(NOT_FOUND_STATUS).json({ message: "card not found" });
+    if (err.message === 'not found') {
+      return res.status(NOT_FOUND_STATUS).json({ message: 'card not found' });
     }
     return res
       .status(INTERNAL_SERVER_STATUS)

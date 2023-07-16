@@ -7,3 +7,6 @@ export const NOT_FOUND_STATUS = 404;
 export const FORBIDDEN_STATUS = 403;
 
 export const INTERNAL_SERVER_STATUS = 500;
+
+export const saltRounds = 10;
+export const secretKey = 'secret';

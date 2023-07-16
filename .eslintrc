@@ -9,7 +9,6 @@
         ]
       }
     ],
-    "quotes": "off",
     "linebreak-style": "off",
     "import/extensions": [
       "error",
