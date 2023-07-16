@@ -21,7 +21,7 @@ export const getUsers = async (_, res, next) => {
 export const getUser = async (req, res, next) => {
   const { userId } = req.params;
   try {
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).orFail(() => { throw new NotFoundError('user not found'); });
 
     return res.status(OK_STATUS).json(user);
   } catch (err) {
