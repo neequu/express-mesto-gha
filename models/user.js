@@ -6,15 +6,14 @@ import { linkRegex } from '../utils/constants.js';
 const UserSchema = new Schema({
   name: {
     type: String,
-    default: ' ',
-    required: true,
+    default: 'zz',
     minlength: [2, 'длина поля должна быть от 2 до 30 символов'],
     maxlength: [30, 'длина поля должна быть от 2 до 30 символов'],
   },
 
   about: {
     type: String,
-    default: ' ',
+    default: 'zz',
     minlength: [2, 'длина поля должна быть от 2 до 30 символов'],
     maxlength: [30, 'длина поля должна быть от 2 до 30 символов'],
   },
