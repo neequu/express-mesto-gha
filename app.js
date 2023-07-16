@@ -18,7 +18,6 @@ app.use(auth, routes);
 
 app.use((err, _, res, next) => {
   const { statusCode = INTERNAL_SERVER_STATUS, message } = err;
-  console.log(err)
   const errorMessage = statusCode === INTERNAL_SERVER_STATUS
     ? 'server error'
     : message;
@@ -26,7 +25,7 @@ app.use((err, _, res, next) => {
   res
     .status(statusCode)
     .json({
-      message: message,
+      message: errorMessage,
     });
 
   next();
