@@ -1,7 +1,5 @@
 import mongoose from 'mongoose';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import bcrypt from 'bcrypt';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
 import {
@@ -14,34 +12,28 @@ import {
   saltRounds,
   secretKey,
 } from '../utils/constants.js';
+import BadRequestError from '../errors/bad-request.js';
 
-export const getUsers = async (_, res) => {
+export const getUsers = async (_, res, next) => {
   try {
     const users = await User.find();
     return res.status(OK_STATUS).json(users);
   } catch (err) {
-    return res
-      .status(INTERNAL_SERVER_STATUS)
-      .json({ message: "couldn't get users" });
+    return next(err);
   }
 };
 
-export const getUser = async (req, res) => {
+export const getUser = async (req, res, next) => {
   const userId = req.params.id;
   try {
     const user = await User.findById(userId).orFail(new Error('not found'));
 
     return res.status(OK_STATUS).json(user);
   } catch (err) {
-    if (err.message === 'not found') {
-      return res.status(NOT_FOUND_STATUS).send({ message: 'user not found' });
-    }
     if (err instanceof mongoose.Error.CastError) {
-      return res
-        .status(BAD_REQUEST_STATUS)
-        .send({ message: 'error getting the user' });
+      return next(new BadRequestError('bad data'));
     }
-    return res.status(INTERNAL_SERVER_STATUS).send({ message: 'server error' });
+    return next(err);
   }
 };
 
