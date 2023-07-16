@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose';
 import isEmail from 'validator/lib/isEmail.js';
 import bcrypt from 'bcrypt';
+import { linkRegex } from '../utils/constants.js';
 
 const UserSchema = new Schema({
   name: {
@@ -21,7 +22,7 @@ const UserSchema = new Schema({
     type: String,
     required: true,
     validate: {
-      validator: (url) => /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/.test(url),
+      validator: (url) => linkRegex.test(url),
     },
   },
   email: {
@@ -37,8 +38,6 @@ const UserSchema = new Schema({
     type: String,
     select: false,
     required: true,
-    minlength: [5, 'длина поля должна быть от 5 до 30 символов'],
-    maxlength: [30, 'длина поля должна быть от 5 до 30 символов'],
   },
 });
 

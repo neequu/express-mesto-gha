@@ -6,13 +6,14 @@ import {
   likeCard,
   unlikeCard,
 } from '../controllers/cards.js';
+import { validateCreateCard, validateUpdateCard } from '../middlewares/validation.js';
 
 const router = express.Router();
 
 router.get('/', getCards);
-router.post('/', createCard);
-router.delete('/:cardId', deleteCard);
-router.put('/:cardId/likes', likeCard);
-router.delete('/:cardId/likes', unlikeCard);
+router.post('/', validateCreateCard, createCard);
+router.delete('/:cardId', validateUpdateCard, deleteCard);
+router.put('/:cardId/likes', validateUpdateCard, likeCard);
+router.delete('/:cardId/likes', validateUpdateCard, unlikeCard);
 
 export default router;
