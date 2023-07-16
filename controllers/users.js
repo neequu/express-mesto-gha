@@ -32,15 +32,17 @@ export const getUser = async (req, res, next) => {
   }
 };
 
-export const login = async (req, res, next) => {
+export const login = (req, res, next) => {
   const { email, password } = req.body;
-  try {
-    const { _id } = await User.findUserByCredentials(email, password);
-    const token = jwt.sign({ _id }, secretKey, { expiresIn: '7d' });
-    return res.status(OK_STATUS).json({ token });
-  } catch (err) {
-    return next(err);
-  }
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      // создадим токен
+      const token = jwt.sign({ _id: user._id }, secretKey, { expiresIn: '7d' });
+      // аутентификация успешна
+      res.status(OK_STATUS).send({ token });
+    })
+    .catch(next);
 };
 
 export const createUser = async (req, res, next) => {

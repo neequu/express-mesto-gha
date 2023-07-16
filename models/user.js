@@ -43,22 +43,22 @@ const UserSchema = new Schema({
 });
 
 // eslint-disable-next-line func-names
-UserSchema.statics.findUserByCredentials = async function (email, password) {
-  try {
-    const user = await this.findOne({ email }).select('+password');
+UserSchema.statics.findUserByCredentials = function (email, password) {
+  // попытаемся найти пользователя по почте
+  return this.findOne({ email }).select('+password')
+    .then((user) => {
+      if (!user) { // не нашёлся — отклоняем промис
+        return Promise.reject(new UnathorizedError('bad email or pswrd'));
+      }
+      // нашёлся — сравниваем хеши
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) { // отклоняем промис
+            return Promise.reject(new UnathorizedError('bad email or pswrd'));
+          }
 
-    if (!user) {
-      return Promise.reject(UnathorizedError('bad password or email'));
-    }
-    const matched = await bcrypt.compare(password, user.password);
-
-    if (!matched) {
-      return Promise.reject(UnathorizedError('bad password or email'));
-    }
-
-    return user;
-  } catch (err) {
-    return err;
-  }
+          return user;
+        });
+    });
 };
 export default model('user', UserSchema);
