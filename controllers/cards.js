@@ -18,13 +18,13 @@ export const deleteCard = async (req, res, next) => {
   const { cardId } = req.params;
   const ownerId = req.user._id;
   try {
-    const card = await Card.findByIdAndDelete(cardId).orFail(() => {
+    const card = await Card.findById(cardId).orFail(() => {
       throw new NotFoundError('card not found');
     });
     if (!card.owner.equals(ownerId)) {
       throw new ForbiddenError('forbidden');
     }
-
+    await Card.deleteOne(card);
     return res.status(OK_STATUS).json({ message: 'success' });
   } catch (err) {
     if (err instanceof mongoose.Error.CastError) {

@@ -1,16 +1,12 @@
 import jwt from 'jsonwebtoken';
-import {
-  secretKey, UNATHORIZED_STATUS,
-} from '../utils/constants.js';
+import { secretKey } from '../utils/constants.js';
+import UnathorizedError from '../errors/unathorized.js';
 
-// eslint-disable-next-line consistent-return
 export default function auth(req, res, next) {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return res
-      .status(UNATHORIZED_STATUS)
-      .json({ message: 'need to sign in' });
+    return next(new UnathorizedError('need to sign in'));
   }
 
   const token = authorization.replace('Bearer ', '');
@@ -19,12 +15,10 @@ export default function auth(req, res, next) {
   try {
     payload = jwt.verify(token, secretKey);
   } catch (err) {
-    return res
-      .status(UNATHORIZED_STATUS)
-      .json({ message: 'need to sign in' });
+    return next(new UnathorizedError('need to sign in'));
   }
 
   req.user = payload;
 
-  next();
+  return next();
 }
