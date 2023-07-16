@@ -3,8 +3,8 @@ export const CREATED_STATUS = 201;
 
 export const BAD_REQUEST_STATUS = 400;
 export const UNATHORIZED_STATUS = 401;
-export const NOT_FOUND_STATUS = 404;
 export const FORBIDDEN_STATUS = 403;
+export const NOT_FOUND_STATUS = 404;
 export const CONFLICT_STATUS = 409;
 
 export const INTERNAL_SERVER_STATUS = 500;

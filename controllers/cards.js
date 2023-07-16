@@ -6,44 +6,41 @@ import {
   OK_STATUS,
   NOT_FOUND_STATUS,
   CREATED_STATUS,
-  FORBIDDEN_STATUS,
 } from '../utils/constants.js';
+import BadRequestError from '../errors/bad-request.js';
+import NotFoundError from '../errors/not-found.js';
+import ForbiddenError from '../errors/forbidden.js';
 
-export const getCards = async (_, res) => {
+export const getCards = async (_, res, next) => {
   try {
     const cards = await Card.find();
     return res.status(OK_STATUS).json(cards);
   } catch (err) {
-    return res
-      .status(INTERNAL_SERVER_STATUS)
-      .json({ message: "couldn't get cards" });
+    return next(err);
   }
 };
 
-export const deleteCard = async (req, res) => {
+export const deleteCard = async (req, res, next) => {
   const { cardId } = req.params;
   const ownerId = req.user._id;
   try {
-    const card = await Card.findByIdAndDelete(cardId).orFail(new Error('not found'));
+    const card = await Card.findByIdAndDelete(cardId).orFail(() => {
+      throw new NotFoundError();
+    });
     if (card.owner !== ownerId) {
-      return res.status(FORBIDDEN_STATUS).send({ message: 'forbidden request' });
+      throw new ForbiddenError();
     }
 
     return res.status(OK_STATUS).json({ message: 'success' });
   } catch (err) {
-    if (err.message === 'not found') {
-      return res.status(NOT_FOUND_STATUS).send({ message: 'card not found' });
-    }
     if (err instanceof mongoose.Error.CastError) {
-      return res
-        .status(BAD_REQUEST_STATUS)
-        .send({ message: 'error getting the card' });
+      return next(new BadRequestError());
     }
-    return res.status(INTERNAL_SERVER_STATUS).send({ message: 'server error' });
+    return next(err);
   }
 };
 
-export const createCard = async (req, res) => {
+export const createCard = async (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user;
   try {
@@ -51,13 +48,9 @@ export const createCard = async (req, res) => {
     return res.status(CREATED_STATUS).json(card);
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
-      return res
-        .status(BAD_REQUEST_STATUS)
-        .json({ message: 'incorrect input' });
+      return next(new BadRequestError());
     }
-    return res
-      .status(INTERNAL_SERVER_STATUS)
-      .json({ message: "couldn't create card" });
+    return next(err);
   }
 };
 
