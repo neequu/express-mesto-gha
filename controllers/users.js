@@ -19,9 +19,9 @@ export const getUsers = async (_, res, next) => {
 };
 
 export const getUser = async (req, res, next) => {
-  const userId = req.params.id;
+  const { userId } = req.params;
   try {
-    const user = await User.findById(userId).orFail(new Error('not found'));
+    const user = await User.findById(userId);
 
     return res.status(OK_STATUS).json(user);
   } catch (err) {
@@ -37,10 +37,8 @@ export const login = (req, res, next) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      // создадим токен
       const token = jwt.sign({ _id: user._id }, secretKey, { expiresIn: '7d' });
-      // аутентификация успешна
-      res.status(OK_STATUS).send({ token });
+      res.status(OK_STATUS).json({ token });
     })
     .catch(next);
 };
