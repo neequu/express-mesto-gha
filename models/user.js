@@ -7,21 +7,21 @@ import UnathorizedError from '../errors/unathorized.js';
 const UserSchema = new Schema({
   name: {
     type: String,
-    default: 'zz',
+    default: 'Жак-Ив Кусто',
     minlength: [2, 'длина поля должна быть от 2 до 30 символов'],
     maxlength: [30, 'длина поля должна быть от 2 до 30 символов'],
   },
 
   about: {
     type: String,
-    default: 'zz',
+    default: 'Исследователь',
     minlength: [2, 'длина поля должна быть от 2 до 30 символов'],
     maxlength: [30, 'длина поля должна быть от 2 до 30 символов'],
   },
 
   avatar: {
     type: String,
-    default: 'https://cdn.vox-cdn.com/thumbor/ZP9Hg4NQdvje9TlrZhFeZo5x7Vw=/1400x1400/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/11656311/LainAt20_Getty_PioneerLDC_Ringer.jpg',
+    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     validate: {
       validator: (url) => linkRegex.test(url),
     },
