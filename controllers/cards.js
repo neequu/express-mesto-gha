@@ -36,13 +36,13 @@ export const deleteCard = async (req, res, next) => {
 
 export const createCard = async (req, res, next) => {
   const { name, link } = req.body;
-  const owner = req.user;
+  const owner = req.user._id;
   try {
     const card = await Card.create({ name, link, owner });
     return res.status(CREATED_STATUS).json(card);
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
-      return next(new BadRequestError('incorrect data'));
+      return next(new BadRequestError(err.message));
     }
     return next(err);
   }
