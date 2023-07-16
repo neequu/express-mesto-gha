@@ -6,6 +6,7 @@ import { linkRegex } from '../utils/constants.js';
 const UserSchema = new Schema({
   name: {
     type: String,
+    default: ' ',
     required: true,
     minlength: [2, 'длина поля должна быть от 2 до 30 символов'],
     maxlength: [30, 'длина поля должна быть от 2 до 30 символов'],
@@ -13,22 +14,22 @@ const UserSchema = new Schema({
 
   about: {
     type: String,
-    required: true,
+    default: ' ',
     minlength: [2, 'длина поля должна быть от 2 до 30 символов'],
     maxlength: [30, 'длина поля должна быть от 2 до 30 символов'],
   },
 
   avatar: {
     type: String,
-    required: true,
+    default: 'https://cdn.vox-cdn.com/thumbor/ZP9Hg4NQdvje9TlrZhFeZo5x7Vw=/1400x1400/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/11656311/LainAt20_Getty_PioneerLDC_Ringer.jpg',
     validate: {
       validator: (url) => linkRegex.test(url),
     },
   },
   email: {
     type: String,
-    required: true,
     unique: true,
+    required: true,
     validate: {
       validator: (email) => isEmail(email),
       message: 'incorrect email',
