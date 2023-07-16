@@ -1,12 +1,6 @@
 import mongoose from 'mongoose';
 import Card from '../models/card.js';
-import {
-  BAD_REQUEST_STATUS,
-  INTERNAL_SERVER_STATUS,
-  OK_STATUS,
-  NOT_FOUND_STATUS,
-  CREATED_STATUS,
-} from '../utils/constants.js';
+import { OK_STATUS, CREATED_STATUS } from '../utils/constants.js';
 import BadRequestError from '../errors/bad-request.js';
 import NotFoundError from '../errors/not-found.js';
 import ForbiddenError from '../errors/forbidden.js';
@@ -25,16 +19,16 @@ export const deleteCard = async (req, res, next) => {
   const ownerId = req.user._id;
   try {
     const card = await Card.findByIdAndDelete(cardId).orFail(() => {
-      throw new NotFoundError();
+      throw new NotFoundError('card not found');
     });
     if (card.owner !== ownerId) {
-      throw new ForbiddenError();
+      throw new ForbiddenError('forbidden');
     }
 
     return res.status(OK_STATUS).json({ message: 'success' });
   } catch (err) {
     if (err instanceof mongoose.Error.CastError) {
-      return next(new BadRequestError());
+      return next(new BadRequestError('bad data'));
     }
     return next(err);
   }
@@ -48,41 +42,36 @@ export const createCard = async (req, res, next) => {
     return res.status(CREATED_STATUS).json(card);
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
-      return next(new BadRequestError());
+      return next(new BadRequestError('incorrect data'));
     }
     return next(err);
   }
 };
 
-const updateCardLike = async (req, res, _, action) => {
+const updateCardLike = async (req, res, next, action) => {
   const { cardId } = req.params;
   try {
-    await Card.findByIdAndUpdate(cardId, action, { new: true }).orFail(
-      new Error('not found'),
-    );
+    const card = await Card.findByIdAndUpdate(cardId, action, { new: true }).orFail(() => {
+      throw new NotFoundError('card not found');
+    });
 
-    return res.status(OK_STATUS).json({ message: 'success' });
+    return res.status(OK_STATUS).json(card);
   } catch (err) {
     if (err instanceof mongoose.Error.CastError) {
-      return res.status(BAD_REQUEST_STATUS).json({ message: 'bad card data' });
+      return next(new BadRequestError('incorrect data'));
     }
-    if (err.message === 'not found') {
-      return res.status(NOT_FOUND_STATUS).json({ message: 'card not found' });
-    }
-    return res
-      .status(INTERNAL_SERVER_STATUS)
-      .json({ message: "couldn't set like" });
+    return next(err);
   }
 };
 
-export const likeCard = (req, res, _) => {
+export const likeCard = (req, res, next) => {
   const owner = req.user._id;
   const likeAction = { $addToSet: { likes: owner } };
-  updateCardLike(req, res, _, likeAction);
+  updateCardLike(req, res, next, likeAction);
 };
 
-export const unlikeCard = (req, res, _) => {
+export const unlikeCard = (req, res, next) => {
   const owner = req.user._id;
   const unlikeAction = { $pull: { likes: owner } };
-  updateCardLike(req, res, _, unlikeAction);
+  updateCardLike(req, res, next, unlikeAction);
 };

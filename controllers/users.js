@@ -3,16 +3,11 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
 import {
-  BAD_REQUEST_STATUS,
-  INTERNAL_SERVER_STATUS,
-  OK_STATUS,
-  NOT_FOUND_STATUS,
-  CREATED_STATUS,
-  UNATHORIZED_STATUS,
-  saltRounds,
-  secretKey,
+  OK_STATUS, CREATED_STATUS, saltRounds, secretKey,
 } from '../utils/constants.js';
 import BadRequestError from '../errors/bad-request.js';
+import NotFoundError from '../errors/not-found.js';
+import ConflictError from '../errors/confilct.js';
 
 export const getUsers = async (_, res, next) => {
   try {
@@ -31,27 +26,28 @@ export const getUser = async (req, res, next) => {
     return res.status(OK_STATUS).json(user);
   } catch (err) {
     if (err instanceof mongoose.Error.CastError) {
-      return next(new BadRequestError('bad data'));
+      return next(new BadRequestError('bad user data'));
     }
     return next(err);
   }
 };
 
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const { _id } = await User.findUserByCredentials(email, password);
     const token = jwt.sign({ _id }, secretKey, { expiresIn: '7d' });
     return res.status(OK_STATUS).json({ token });
   } catch (err) {
-    return res.status(UNATHORIZED_STATUS);
+    return next(err);
   }
 };
 
-export const createUser = async (req, res) => {
+export const createUser = async (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
+
   try {
     const hash = await bcrypt.hash(password, saltRounds);
     const user = await User.create({
@@ -60,38 +56,28 @@ export const createUser = async (req, res) => {
 
     return res.status(CREATED_STATUS).json(user);
   } catch (err) {
-    if (err.code === 11000) {
-      return res.status(BAD_REQUEST_STATUS).json({ message: 'already created' });
-    }
-    if (err instanceof mongoose.Error.ValidationError) {
-      return res
-        .status(BAD_REQUEST_STATUS)
-        .json({ message: 'incorrect input' });
-    }
-    return res
-      .status(INTERNAL_SERVER_STATUS)
-      .json({ message: "couldn't create user" });
+    if (err.code === 11000) return next(new ConflictError('already exists'));
+
+    if (err instanceof mongoose.Error.ValidationError) return next(new BadRequestError('bad data'));
+
+    return next(err);
   }
 };
 
-const updateUser = async (req, res, _, data) => {
+const updateUser = async (req, res, next, data) => {
   const owner = req.user._id;
   try {
     const user = await User.findByIdAndUpdate(owner, data, {
       new: true,
       runValidators: true,
+    }).orFail(() => {
+      throw new NotFoundError('user not found');
     });
 
     return res.status(OK_STATUS).json(user);
   } catch (err) {
-    if (err instanceof mongoose.Error.ValidationError) {
-      return res
-        .status(BAD_REQUEST_STATUS)
-        .json({ message: 'incorrect input' });
-    }
-    return res
-      .status(INTERNAL_SERVER_STATUS)
-      .json({ message: "couldn't update user" });
+    if (err instanceof mongoose.Error.ValidationError) return next(new BadRequestError('bad data'));
+    return next(err);
   }
 };
 
@@ -104,21 +90,14 @@ export const updateAvatar = (req, res, _) => {
   return updateUser(req, res, _, { avatar });
 };
 
-export const getCurrentUser = async (req, res) => {
+export const getCurrentUser = async (req, res, next) => {
   const userId = req.user._id;
   try {
-    const user = await User.findById(userId).orFail(new Error('not found'));
+    const user = await User.findById(userId).orFail(new NotFoundError('user not found'));
 
     return res.status(OK_STATUS).json(user);
   } catch (err) {
-    if (err.message === 'not found') {
-      return res.status(NOT_FOUND_STATUS).send({ message: 'user not found' });
-    }
-    if (err instanceof mongoose.Error.CastError) {
-      return res
-        .status(BAD_REQUEST_STATUS)
-        .send({ message: 'error getting the user' });
-    }
-    return res.status(INTERNAL_SERVER_STATUS).send({ message: 'server error' });
+    if (err instanceof mongoose.Error.CastError) return next(new BadRequestError('bad data'));
+    return next(err);
   }
 };
