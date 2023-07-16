@@ -21,7 +21,7 @@ export const deleteCard = async (req, res, next) => {
     const card = await Card.findByIdAndDelete(cardId).orFail(() => {
       throw new NotFoundError('card not found');
     });
-    if (card.owner !== ownerId) {
+    if (!card.owner.equals(ownerId)) {
       throw new ForbiddenError('forbidden');
     }
 
