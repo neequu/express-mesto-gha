@@ -6,8 +6,8 @@ const CardSchema = new Schema({
   name: {
     type: String,
     required: true,
-    minlength: [2, 'длина поля должна быть от 2 до 30 символов'],
-    maxlength: [30, 'длина поля должна быть от 2 до 30 символов'],
+    minlength: [2, 'length of this field should be 2-30 symbols'],
+    maxlength: [30, 'length of this field should be 2-30 symbols'],
   },
 
   link: {

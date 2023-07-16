@@ -8,15 +8,15 @@ const UserSchema = new Schema({
   name: {
     type: String,
     default: 'Жак-Ив Кусто',
-    minlength: [2, 'длина поля должна быть от 2 до 30 символов'],
-    maxlength: [30, 'длина поля должна быть от 2 до 30 символов'],
+    minlength: [2, 'length of this field should be 2-30 symbols'],
+    maxlength: [30, 'length of this field should be 2-30 symbols'],
   },
 
   about: {
     type: String,
     default: 'Исследователь',
-    minlength: [2, 'длина поля должна быть от 2 до 30 символов'],
-    maxlength: [30, 'длина поля должна быть от 2 до 30 символов'],
+    minlength: [2, 'length of this field should be 2-30 symbols'],
+    maxlength: [30, 'length of this field should be 2-30 symbols'],
   },
 
   avatar: {
@@ -43,22 +43,15 @@ const UserSchema = new Schema({
 });
 
 // eslint-disable-next-line func-names
-UserSchema.statics.findUserByCredentials = function (email, password) {
-  // попытаемся найти пользователя по почте
-  return this.findOne({ email }).select('+password')
-    .then((user) => {
-      if (!user) { // не нашёлся — отклоняем промис
-        return Promise.reject(new UnathorizedError('bad email or pswrd'));
-      }
-      // нашёлся — сравниваем хеши
-      return bcrypt.compare(password, user.password)
-        .then((matched) => {
-          if (!matched) { // отклоняем промис
-            return Promise.reject(new UnathorizedError('bad email or pswrd'));
-          }
-
-          return user;
-        });
-    });
+UserSchema.statics.findUserByCredentials = async function (email, password) {
+  try {
+    const user = await this.findOne({ email }).select('+password');
+    if (!user) return Promise.reject(new UnathorizedError('bad email or pswrd'));
+    const matched = await bcrypt.compare(password, user.password);
+    if (!matched) return Promise.reject(new UnathorizedError('bad email or pswrd'));
+    return user;
+  } catch (err) {
+    return err;
+  }
 };
 export default model('user', UserSchema);

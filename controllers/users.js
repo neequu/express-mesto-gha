@@ -39,7 +39,7 @@ export const login = async (req, res, next) => {
     const token = jwt.sign({ _id: user._id }, secretKey, { expiresIn: '7d' });
     return res.status(OK_STATUS).json({ token });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
