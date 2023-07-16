@@ -1,5 +1,6 @@
 import express from 'express';
 import { connect } from 'mongoose';
+import { errors } from 'celebrate';
 import routes from './routes/index.js';
 import { login, createUser } from './controllers/users.js';
 import auth from './middlewares/auth.js';
@@ -17,6 +18,7 @@ app.post('/signin', validateLogin, login);
 app.post('/signup', validateCreateUser, createUser);
 app.use(auth, routes);
 
+app.use(errors());
 app.use((err, _, res, next) => {
   const { statusCode = INTERNAL_SERVER_STATUS, message } = err;
   const errorMessage = statusCode === INTERNAL_SERVER_STATUS
