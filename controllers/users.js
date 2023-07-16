@@ -52,13 +52,13 @@ export const createUser = async (req, res, next) => {
     const hash = await bcrypt.hash(password, saltRounds);
     const user = await User.create({
       name, about, avatar, email, password: hash,
+    }).orFail(() => {
+      throw new BadRequestError('bad data');
     });
 
     return res.status(CREATED_STATUS).json(user);
   } catch (err) {
     if (err.code === 11000) return next(new ConflictError('already exists'));
-
-    if (err instanceof mongoose.Error.ValidationError) return next(new BadRequestError('bad data'));
 
     return next(err);
   }
@@ -81,19 +81,19 @@ const updateUser = async (req, res, next, data) => {
   }
 };
 
-export const updateProfile = (req, res, _) => {
+export const updateProfile = (req, res, next) => {
   const { name, about } = req.body;
-  return updateUser(req, res, _, { name, about });
+  return updateUser(req, res, next, { name, about });
 };
-export const updateAvatar = (req, res, _) => {
+export const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  return updateUser(req, res, _, { avatar });
+  return updateUser(req, res, next, { avatar });
 };
 
 export const getCurrentUser = async (req, res, next) => {
   const userId = req.user._id;
   try {
-    const user = await User.findById(userId).orFail(new NotFoundError('user not found'));
+    const user = await User.findById(userId).orFail(() => { throw new NotFoundError('user not found'); });
 
     return res.status(OK_STATUS).json(user);
   } catch (err) {
