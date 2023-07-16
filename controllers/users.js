@@ -50,11 +50,11 @@ export const createUser = async (req, res, next) => {
 
   try {
     const hash = await bcrypt.hash(password, saltRounds);
-    const user = await User.create({
+    await User.create({
       name, about, avatar, email, password: hash,
     });
 
-    return res.status(CREATED_STATUS).json(user);
+    return res.status(CREATED_STATUS).json({name, about, avatar, email});
   } catch (err) {
     if (err.code === 11000) return next(new ConflictError('already exists'));
     if (err instanceof mongoose.Error.ValidationError) return next(new BadRequestError('bad data'));
