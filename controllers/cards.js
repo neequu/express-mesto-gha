@@ -6,7 +6,7 @@ import {
   OK_STATUS,
   NOT_FOUND_STATUS,
   CREATED_STATUS,
-  UNATHORIZED_STATUS,
+  FORBIDDEN_STATUS,
 } from '../utils/constants.js';
 
 export const getCards = async (_, res) => {
@@ -26,7 +26,7 @@ export const deleteCard = async (req, res) => {
   try {
     const card = await Card.findByIdAndDelete(cardId).orFail(new Error('not found'));
     if (card.owner !== ownerId) {
-      return res.status(UNATHORIZED_STATUS).send({ message: 'unathorized request' });
+      return res.status(FORBIDDEN_STATUS).send({ message: 'forbidden request' });
     }
 
     return res.status(OK_STATUS).json({ message: 'success' });
